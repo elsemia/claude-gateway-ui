@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       api_keys: {
         Row: {
+          api_key_hash: string | null
           created_at: string
           daily_limit_tokens: number
           friend_name: string
@@ -27,6 +28,7 @@ export type Database = {
           used_today: number
         }
         Insert: {
+          api_key_hash?: string | null
           created_at?: string
           daily_limit_tokens?: number
           friend_name: string
@@ -38,6 +40,7 @@ export type Database = {
           used_today?: number
         }
         Update: {
+          api_key_hash?: string | null
           created_at?: string
           daily_limit_tokens?: number
           friend_name?: string
@@ -52,6 +55,8 @@ export type Database = {
       }
       usage_logs: {
         Row: {
+          api_key_id: string | null
+          error_message: string | null
           friend_name: string | null
           id: string
           input_tokens: number
@@ -62,6 +67,8 @@ export type Database = {
           total_tokens: number
         }
         Insert: {
+          api_key_id?: string | null
+          error_message?: string | null
           friend_name?: string | null
           id?: string
           input_tokens?: number
@@ -72,6 +79,8 @@ export type Database = {
           total_tokens?: number
         }
         Update: {
+          api_key_id?: string | null
+          error_message?: string | null
           friend_name?: string | null
           id?: string
           input_tokens?: number

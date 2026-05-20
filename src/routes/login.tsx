@@ -15,7 +15,9 @@ function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -27,6 +29,7 @@ function LoginPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setNotice(null);
     setLoading(true);
     try {
       if (mode === "signin") {
@@ -34,13 +37,19 @@ function LoginPage() {
         if (error) throw error;
         navigate({ to: "/admin" });
       } else {
+        if (password !== confirm) {
+          throw new Error(t({ pt: "As senhas não coincidem.", en: "Passwords do not match." }, lang));
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: `${window.location.origin}/admin` },
         });
         if (error) throw error;
-        setError(t({ pt: "Verifique seu email para confirmar.", en: "Check your email to confirm." }, lang));
+        setNotice(t({
+          pt: "Verifique seu email para confirmar o cadastro antes de entrar.",
+          en: "Check your email to confirm your account before signing in.",
+        }, lang));
       }
     } catch (err) {
       setError((err as Error).message);
@@ -60,14 +69,21 @@ function LoginPage() {
       />
       <main className="max-w-md mx-auto px-6 mt-12">
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
-          <div className="flex gap-1 border-b border-[var(--border)] mb-5">
+          <h1 className="font-serif text-2xl">
+            {t({ pt: "Área do Administrador", en: "Admin Area" }, lang)}
+          </h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            {t({ pt: "Acesse o painel de gerenciamento.", en: "Access the management panel." }, lang)}
+          </p>
+
+          <div className="mt-5 flex gap-1 border-b border-[var(--border)]">
             {[
               { id: "signin" as const, label: t({ pt: "Entrar", en: "Sign in" }, lang) },
-              { id: "signup" as const, label: t({ pt: "Cadastrar", en: "Sign up" }, lang) },
+              { id: "signup" as const, label: t({ pt: "Criar conta", en: "Create account" }, lang) },
             ].map((tb) => (
               <button
                 key={tb.id}
-                onClick={() => { setMode(tb.id); setError(null); }}
+                onClick={() => { setMode(tb.id); setError(null); setNotice(null); }}
                 className={`px-4 py-2 text-sm border-b-2 -mb-px ${
                   mode === tb.id
                     ? "border-[var(--accent)] text-[var(--foreground)] font-medium"
@@ -79,7 +95,7 @@ function LoginPage() {
             ))}
           </div>
 
-          <form onSubmit={submit} className="space-y-3">
+          <form onSubmit={submit} className="space-y-3 mt-5">
             <div>
               <label className="text-xs text-[var(--muted)]">Email</label>
               <input
@@ -103,9 +119,29 @@ function LoginPage() {
                 className="mt-1 w-full bg-[var(--background)] border border-[var(--border)] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
               />
             </div>
+            {mode === "signup" && (
+              <div>
+                <label className="text-xs text-[var(--muted)]">
+                  {t({ pt: "Confirmar senha", en: "Confirm password" }, lang)}
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  className="mt-1 w-full bg-[var(--background)] border border-[var(--border)] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
+                />
+              </div>
+            )}
             {error && (
               <div className="text-xs px-3 py-2 rounded-md border bg-[var(--warn-bg)] border-[var(--warn-border)] text-[var(--warn-text)]">
                 {error}
+              </div>
+            )}
+            {notice && (
+              <div className="text-xs px-3 py-2 rounded-md border bg-[var(--warn-bg)] border-[var(--warn-border)] text-[var(--warn-text)]">
+                {notice}
               </div>
             )}
             <button
@@ -113,7 +149,9 @@ function LoginPage() {
               disabled={loading}
               className="w-full bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white py-2.5 rounded-md text-sm font-medium disabled:opacity-60"
             >
-              {loading ? "…" : mode === "signin" ? t({ pt: "Entrar", en: "Sign in" }, lang) : t({ pt: "Criar conta", en: "Create account" }, lang)}
+              {loading ? "…" : mode === "signin"
+                ? t({ pt: "Entrar", en: "Sign in" }, lang)
+                : t({ pt: "Criar conta", en: "Create account" }, lang)}
             </button>
           </form>
         </div>
