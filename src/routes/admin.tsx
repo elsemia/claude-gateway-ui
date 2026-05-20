@@ -558,6 +558,3 @@ function fmtDate(s: string) {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-
-// Suppress unused import warning for icons consumed only conditionally above
-void X;
