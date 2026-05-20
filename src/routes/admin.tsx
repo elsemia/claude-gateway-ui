@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Check, X, AlertTriangle } from "lucide-react";
+import { Copy, Check, AlertTriangle } from "lucide-react";
 import { Header } from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useLang, t, type Lang } from "@/lib/i18n";
