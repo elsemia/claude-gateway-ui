@@ -61,6 +61,40 @@ function AdminPage() {
   // Confirm dialogs
   const [confirm, setConfirm] = useState<null | { title: string; onYes: () => void }>(null);
 
+  // Invite admin
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
+
+  const sendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteError(null);
+    setInviteSuccess(null);
+    setInviting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("https://zwbtvtbuuclufbnafdfs.supabase.co/functions/v1/invite-admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+      setInviteSuccess(t({ pt: `Convite enviado para ${inviteEmail}!`, en: `Invite sent to ${inviteEmail}!` }, lang));
+      setInviteEmail("");
+    } catch (err) {
+      setInviteError((err as Error).message);
+    } finally {
+      setInviting(false);
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) navigate({ to: "/login" });
