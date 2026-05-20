@@ -61,6 +61,40 @@ function AdminPage() {
   // Confirm dialogs
   const [confirm, setConfirm] = useState<null | { title: string; onYes: () => void }>(null);
 
+  // Invite admin
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
+
+  const sendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteError(null);
+    setInviteSuccess(null);
+    setInviting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("https://zwbtvtbuuclufbnafdfs.supabase.co/functions/v1/invite-admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+      setInviteSuccess(t({ pt: `Convite enviado para ${inviteEmail}!`, en: `Invite sent to ${inviteEmail}!` }, lang));
+      setInviteEmail("");
+    } catch (err) {
+      setInviteError((err as Error).message);
+    } finally {
+      setInviting(false);
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) navigate({ to: "/login" });
@@ -204,6 +238,46 @@ function AdminPage() {
           <Stat label={t({ pt: "Total de usuários", en: "Total users" }, lang)} value={stats.total} />
           <Stat label={t({ pt: "Tokens hoje", en: "Tokens today" }, lang)} value={stats.today.toLocaleString()} />
           <Stat label={t({ pt: "Tokens no mês", en: "Tokens this month" }, lang)} value={stats.month.toLocaleString()} />
+        </section>
+
+        {/* SECTION: Invite admin */}
+        <section>
+          <h2 className="font-serif text-2xl mb-4">{t({ pt: "Convidar administrador", en: "Invite administrator" }, lang)}</h2>
+          <form onSubmit={sendInvite} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 space-y-3">
+            <div>
+              <h3 className="text-sm font-medium">{t({ pt: "Convidar novo admin", en: "Invite new admin" }, lang)}</h3>
+              <p className="text-xs text-[var(--muted)] mt-1">
+                {t({ pt: "O usuário receberá um email com link para definir sua senha.", en: "The user will receive an email with a link to set their password." }, lang)}
+              </p>
+            </div>
+            <div className="flex flex-col md:flex-row gap-3">
+              <input
+                type="email"
+                required
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="email@exemplo.com"
+                className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
+              />
+              <button
+                type="submit"
+                disabled={inviting}
+                className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white px-5 py-2 rounded-md text-sm font-medium disabled:opacity-60"
+              >
+                {inviting ? "…" : t({ pt: "Enviar convite", en: "Send invite" }, lang)}
+              </button>
+            </div>
+            {inviteError && (
+              <div className="text-xs px-3 py-2 rounded-md border bg-[var(--warn-bg)] border-[var(--warn-border)] text-[var(--warn-text)]">
+                {inviteError}
+              </div>
+            )}
+            {inviteSuccess && (
+              <div className="text-xs px-3 py-2 rounded-md border bg-[var(--warn-bg)] border-[var(--warn-border)] text-[var(--warn-text)]">
+                {inviteSuccess}
+              </div>
+            )}
+          </form>
         </section>
 
         {/* SECTION 2: Create key */}
