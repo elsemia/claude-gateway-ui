@@ -47,10 +47,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Cozy Claude Code" },
+      { title: "Claude Code Gateway" },
       { name: "description", content: "Private Anthropic-compatible API gateway." },
-      { property: "og:title", content: "Cozy Claude Code" },
-      { name: "twitter:title", content: "Cozy Claude Code" },
+      { property: "og:title", content: "Claude Code Gateway" },
+      { name: "twitter:title", content: "Claude Code Gateway" },
       { property: "og:description", content: "Private Anthropic-compatible API gateway." },
       { name: "twitter:description", content: "Private Anthropic-compatible API gateway." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/409ea367-8702-4b0d-b185-4b0260ec158f/id-preview-38c81648--d75e4687-aa4d-473a-b09b-8c0b4cafc7b2.lovable.app-1779312173902.png" },
