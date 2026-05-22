@@ -80,6 +80,16 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('type=invite') || hash.includes('type=recovery')) {
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/reset-password') {
+        window.location.href = '/reset-password' + hash;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       router.invalidate();
       queryClient.invalidateQueries();
