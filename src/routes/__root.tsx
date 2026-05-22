@@ -81,11 +81,8 @@ function RootComponent() {
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash.includes('type=invite') || hash.includes('type=recovery')) {
-      const currentPath = window.location.pathname;
-      if (currentPath !== '/reset-password') {
-        window.location.href = '/reset-password' + hash;
-      }
+    if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+      window.location.replace('/reset-password' + hash);
     }
   }, []);
 
